@@ -1,0 +1,68 @@
+{
+  "name": "arma_custom_launcher",
+  "private": false,
+  "version": "2.1.10",
+  "type": "module",
+  "description": "Launcher pour Arma 3",
+  "author": "Joaquine",
+  "productName": "Arma_custom_launcher",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && electron-builder",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "release": "tsc && vite build && electron-builder --publish always"
+  },
+  "dependencies": {
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^6.4.4",
+    "@tailwindcss/vite": "^4.0.6",
+    "electron-squirrel-startup": "^1.0.1",
+    "electron-store": "^10.0.1",
+    "electron-updater": "^6.3.9",
+    "fs-extra": "^11.3.0",
+    "lucide-react": "^0.475.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.5.1",
+    "react-icons": "^5.4.0",
+    "react-markdown": "^9.0.3",
+    "rehype-highlight": "^7.0.2",
+    "tailwindcss": "^4.0.6",
+    "update-electron-app": "^3.1.1",
+    "winreg": "^1.2.5"
+  },
+  "devDependencies": {
+    "@electron/fuses": "^1.8.0",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/fs-extra": "^11.0.4",
+    "@types/react": "^18.2.64",
+    "@types/react-dom": "^18.2.21",
+    "@types/winreg": "^1.2.36",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
+    "@vitejs/plugin-react": "^4.2.1",
+    "electron": "^30.0.1",
+    "electron-builder": "^25.1.8",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "react-router-dom": "^7.1.5",
+    "typescript": "^5.2.2",
+    "vite": "^5.1.6",
+    "vite-plugin-electron": "^0.28.6",
+    "vite-plugin-electron-renderer": "^0.14.5",
+    "vite-plugin-markdown": "^2.2.0"
+  },
+  "main": "dist-electron/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Joaquinee/arma3_launcher.git"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "electron",
+      "esbuild"
+    ]
+  }
+}
