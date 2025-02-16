@@ -57,7 +57,7 @@
   "main": "dist-electron/main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Joaquinee/arma3_launcher.git"
+    "url": "https://github.com/Joaquinee/AR3URL-Launcher.git"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
