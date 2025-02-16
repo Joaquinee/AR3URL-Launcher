@@ -17,6 +17,10 @@ export default function Params() {
   const handleSaveParams = async () => {
     await window.ipcRenderer.invoke("save-params-launch", paramsLaunch);
   };
+  const handleResetStorage = async () => {
+    localStorage.clear();
+    window.location.reload();
+  };
 
   useEffect(() => {
     const getArma3Path = async () => {
@@ -86,6 +90,12 @@ export default function Params() {
             className="bg-red-500 hover:bg-red-700 text-white/90 px-6 py-2 rounded transition-transform transform hover:scale-105 duration-200 cursor-pointer"
           >
             Sauvegarder les paramètres
+          </button>
+          <button
+            onClick={handleResetStorage}
+            className="bg-yellow-500 hover:bg-yellow-700 text-white/90 px-6 py-2 rounded transition-transform transform hover:scale-105 duration-200 cursor-pointer"
+          >
+            Réparer launcher
           </button>
         </div>
       </div>

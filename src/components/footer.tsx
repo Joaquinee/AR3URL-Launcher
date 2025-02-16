@@ -26,6 +26,9 @@ export default function Footer() {
   const [timeRemaining, setTimeRemaining] = useState("");
   const [downloading, setDownloading] = useState(false);
 
+  const [fileFinds, setFileFinds] = useState(false);
+  const [fileFindsName, setFileFindsName] = useState("");
+
   const updateLocalStorage = useCallback((states: Record<string, boolean>) => {
     Object.entries(states).forEach(([key, value]) => {
       localStorage.setItem(key, value.toString());
@@ -58,6 +61,15 @@ export default function Footer() {
       }
     ) => {
       switch (message.message) {
+        case "file_finds":
+          setFileFinds(true);
+          if (message.data) {
+            setFileFindsName(message.data);
+          }
+          break;
+        case "file_finds_end":
+          setFileFinds(false);
+          break;
         case "updateMod-needed":
           setUpdateModNeeded(true);
           break;
@@ -186,6 +198,11 @@ export default function Footer() {
           ) : (
             <div>
               <p>Bienvenue sur le serveur {config.serverName}</p>
+            </div>
+          )}
+          {fileFinds && (
+            <div>
+              <p>Vérification de {fileFindsName} en cours</p>
             </div>
           )}
         </div>

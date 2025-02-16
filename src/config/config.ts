@@ -11,9 +11,9 @@ export const config = {
   serverName: "UnrealLife",
   title: `Unreal Life - ${version}`,
 
-  urlMods: "http://82.29.170.30/modsList",
-  urlRessources: "http://82.29.170.30/other_ressources",
-  mdNews: "http://82.29.170.30/news/news.md",
+  urlMods: "http://188.165.200.136/modsList",
+  urlRessources: "http://188.165.200.136/other_ressources",
+  mdNews: "http://188.165.200.136/news/news.md",
 
   serverIp: "127.0.0.1",
   serverPort: 2302,

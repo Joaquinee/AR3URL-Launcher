@@ -5,6 +5,7 @@ import Registry from "winreg";
 import path from "node:path";
 import { config } from "../src/config/config";
 import { spawn } from "child_process";
+import * as crypto from "crypto";
 
 // Configuration du store avec des valeurs par défaut
 const store = new Store({
@@ -172,14 +173,13 @@ export function setupIpcHandlers(win: BrowserWindow) {
     getDLLAndCPP();
     // Envoyer le message de début de téléchargement pour verrouiller l'interface
     sendMessage(win, "download-start");
+    await getFileFinds(win);
 
     if (shouldStopDownload) shouldStopDownload = false;
     try {
       const modPath = `${arma3Path}\\${config.folderModsName}\\addons`;
-
       // S'assurer que le dossier existe
       await fs.ensureDir(modPath);
-
       // Récupérer les listes de mods avec vérification
       const modsListServer =
         (storeModsListServer.get("modsList") as {
@@ -518,7 +518,15 @@ async function getUpdateMod(win: BrowserWindow) {
     storeModsListClient.set("modsList", modsListClient);
 
     //Envoyez une notification pour dire que mise a jours nécéssaire, et le nombre de mods à mettre a jour
-    if (modsToDownload.length > 0) {
+
+    const isMaintenance = config.maintenance;
+    if (isMaintenance) {
+      sendMessage(
+        win,
+        "maintenance",
+        "Le serveur est en maintenance, merci de réessayer plus tard"
+      );
+    } else if (modsToDownload.length > 0) {
       sendMessage(
         win,
         "updateMod-needed",
@@ -533,6 +541,7 @@ async function getUpdateMod(win: BrowserWindow) {
   }
 }
 
+//Récupérer les DLL et CPP
 async function getDLLAndCPP() {
   const url = `${config.urlRessources}`;
   const arma3Path = store.get("arma3Path") as string | null;
@@ -624,4 +633,72 @@ async function getDLLAndCPP() {
   } catch (error) {
     return false;
   }
+}
+
+async function getFileFinds(win: BrowserWindow) {
+  const arma3Path = store.get("arma3Path") as string | null;
+  if (!arma3Path) return false;
+  const pathMods = path.join(arma3Path, config.folderModsName, "addons");
+  if (!fs.existsSync(pathMods)) return false;
+  sendMessage(win, "check_mods", "Nous vérifions les mods deja installer");
+
+  const clientList = storeModsListClient.get("modsList") as {
+    hash: string;
+    name: string;
+    size: number;
+  }[];
+  const serverList = storeModsListServer.get("modsList") as {
+    hash: string;
+    name: string;
+    size: number;
+  }[];
+
+  for (const file of fs.readdirSync(pathMods)) {
+    const filePath = path.join(pathMods, file);
+    const serverModCheck = serverList.find((mod) => mod.name === file);
+    const clientModCheck = clientList.find((mod) => mod.name === file);
+
+    sendMessage(
+      win,
+      "file_finds",
+      undefined,
+      undefined,
+      file,
+      undefined,
+      undefined
+    );
+
+    if (
+      serverModCheck &&
+      clientModCheck &&
+      serverModCheck.hash === clientModCheck.hash &&
+      serverModCheck.size === clientModCheck.size &&
+      serverModCheck.name === clientModCheck.name
+    ) {
+      console.log(file + "OK");
+      continue;
+    }
+
+    const fileBuffer = fs.readFileSync(filePath);
+    const fileHash = crypto
+      .createHash("sha256")
+      .update(fileBuffer)
+      .digest("hex");
+
+    const serverMod = serverList.find((mod) => mod.name === file);
+    if (serverMod && serverMod.hash === fileHash) {
+      //Eviter les doublons
+      if (clientList.find((mod) => mod.name === file)) continue;
+      clientList.push({
+        hash: fileHash,
+        name: file,
+        size: fileBuffer.length,
+      });
+
+      storeModsListClient.set("modsList", clientList);
+    }
+  }
+  sendMessage(win, "file_finds_end");
+
+  return true;
 }

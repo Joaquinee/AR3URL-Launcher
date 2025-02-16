@@ -1,11 +1,11 @@
 {
-  "name": "arma_custom_launcher",
+  "name": "ar3url_launcher",
   "private": false,
-  "version": "2.1.10",
+  "version": "2.1.20",
   "type": "module",
-  "description": "Launcher pour Arma 3",
+  "description": "Launcher pour A3URL",
   "author": "Joaquine",
-  "productName": "Arma_custom_launcher",
+  "productName": "A3URL Launcher",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && electron-builder",
