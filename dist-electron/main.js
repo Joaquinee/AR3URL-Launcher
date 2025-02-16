@@ -19640,9 +19640,9 @@ ge.prototype.valueExists = function(t, r) {
   }), this;
 };
 var _q = ge;
-const Vs = /* @__PURE__ */ Ks(_q), ky = "2.1.20", Ht = {
+const Vs = /* @__PURE__ */ Ks(_q), ky = "2.1.21", Ht = {
   version: ky,
-  maintenance: !1,
+  maintenance: !0,
   discord: "https://discord.gg/E8eRK4uhPj",
   //Peut etre vide
   teamspeak: "ts3server://ts3.unreallife.fr",
@@ -19939,10 +19939,10 @@ async function Pq(e) {
       );
       u > -1 && a.splice(u, 1);
     }
-    return ji.set("modsList", a), Ht.maintenance || o.length > 0 && De(
+    return ji.set("modsList", a), Ht.maintenance && De(
       e,
-      "updateMod-needed",
-      `Mise à jour nécessaire, ${o.length} mods à mettre à jour`
+      "maintenance",
+      "Le serveur est en maintenance, merci de réessayer plus tard"
     ), !0;
   } catch (n) {
     return console.error("Erreur lors de la création du dossier mod:", n), !1;
