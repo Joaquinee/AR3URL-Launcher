@@ -6,6 +6,7 @@ import path from "node:path";
 import { config } from "../src/config/config";
 import { spawn } from "child_process";
 import * as crypto from "crypto";
+import yaml from "js-yaml";
 
 // Configuration du store avec des valeurs par défaut
 const store = new Store({
@@ -91,7 +92,19 @@ export function setupIpcHandlers(win: BrowserWindow) {
     //Last news
     const lastNews = await fetch(config.mdNews);
     const lastNewsData = await lastNews.text();
-    news.set("lastNews", lastNewsData);
+
+    try {
+      const newsItems = yaml.load(lastNewsData);
+      news.set("lastNews", newsItems);
+    } catch (error) {
+      console.error("Erreur lors de l'analyse du YAML:", error);
+      sendMessage(
+        win,
+        "yaml-parse-error",
+        undefined,
+        "Erreur lors de l'analyse des nouvelles"
+      );
+    }
 
     // Tente de récupérer le chemin depuis le registre si non défini
     if (!arma3Path || arma3Path === "null") {

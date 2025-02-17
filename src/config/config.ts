@@ -2,7 +2,7 @@ import { version } from "../../package.json";
 
 export const config = {
   version: version,
-  maintenance: true,
+  maintenance: false,
   discord: "https://discord.gg/E8eRK4uhPj", //Peut etre vide
   teamspeak: "ts3server://ts3.unreallife.fr", //Peut etre vide
   website: "https://unreallife.fr/", //Peut etre vide
