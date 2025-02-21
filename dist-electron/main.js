@@ -28879,7 +28879,7 @@ Registry.prototype.valueExists = function valueExists(name, cb) {
 };
 var registry = Registry;
 const Registry$1 = /* @__PURE__ */ getDefaultExportFromCjs(registry);
-const version = "2.1.23";
+const version = "2.1.24";
 const config = {
   version,
   maintenance: false,
@@ -29218,7 +29218,7 @@ function setupIpcHandlers(win2) {
     return ts3Path;
   });
   ipcMain$1.handle("save-params-launch", async (_, paramsLaunch) => {
-    console.log(paramsLaunch);
+    store.set("paramsLaunch", paramsLaunch);
   });
   ipcMain$1.handle("launch-game", async () => {
     const arma3Path = store.get("arma3Path");
@@ -29268,6 +29268,7 @@ async function getUpdateMod(win2) {
     const modsListServerData = await modsListServer.json();
     storeModsListServer.clear();
     storeModsListServer.set("modsList", modsListServerData);
+    await checkExistFilesMods();
     const modsListClient = storeModsListClient.get("modsList") || [];
     const modsToDownload = [];
     const modsToDelete = [];
@@ -29395,7 +29396,6 @@ async function getFileFinds(win2) {
       void 0
     );
     if (serverModCheck && clientModCheck && serverModCheck.hash === clientModCheck.hash && serverModCheck.size === clientModCheck.size && serverModCheck.name === clientModCheck.name) {
-      console.log(file2 + "OK");
       continue;
     }
     const fileBuffer = fs.readFileSync(filePath);
@@ -29413,6 +29413,20 @@ async function getFileFinds(win2) {
   }
   sendMessage(win2, "file_finds_end");
   return true;
+}
+async function checkExistFilesMods() {
+  const arma3Path = store.get("arma3Path");
+  if (!arma3Path) return false;
+  const pathMods = path$v.join(arma3Path, config.folderModsName, "addons");
+  if (!fs.existsSync(pathMods)) return false;
+  const clientList = storeModsListClient.get("modsList");
+  for (const file2 of clientList) {
+    const filePath = path$v.join(pathMods, file2.name);
+    if (!fs.existsSync(filePath)) {
+      clientList.splice(clientList.indexOf(file2), 1);
+    }
+  }
+  storeModsListClient.set("modsList", clientList);
 }
 const __dirname = path$v.dirname(fileURLToPath(import.meta.url));
 process.env.APP_ROOT = path$v.join(__dirname, "..");

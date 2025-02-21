@@ -429,7 +429,7 @@ export function setupIpcHandlers(win: BrowserWindow) {
   });
 
   ipcMain.handle("save-params-launch", async (_, paramsLaunch) => {
-    console.log(paramsLaunch);
+    store.set("paramsLaunch", paramsLaunch);
   });
   //Gestionnaire de lancement du jeu
   ipcMain.handle("launch-game", async () => {
@@ -485,7 +485,7 @@ async function getUpdateMod(win: BrowserWindow) {
     const modsListServerData = await modsListServer.json();
     storeModsListServer.clear();
     storeModsListServer.set("modsList", modsListServerData);
-
+    await checkExistFilesMods();
     //Récupérer la liste des mods client
     const modsListClient =
       (storeModsListClient.get("modsList") as {
@@ -688,7 +688,6 @@ async function getFileFinds(win: BrowserWindow) {
       serverModCheck.size === clientModCheck.size &&
       serverModCheck.name === clientModCheck.name
     ) {
-      console.log(file + "OK");
       continue;
     }
 
@@ -714,4 +713,25 @@ async function getFileFinds(win: BrowserWindow) {
   sendMessage(win, "file_finds_end");
 
   return true;
+}
+
+async function checkExistFilesMods() {
+  const arma3Path = store.get("arma3Path") as string | null;
+  if (!arma3Path) return false;
+  const pathMods = path.join(arma3Path, config.folderModsName, "addons");
+  if (!fs.existsSync(pathMods)) return false;
+
+  const clientList = storeModsListClient.get("modsList") as {
+    hash: string;
+    name: string;
+    size: number;
+  }[];
+
+  for (const file of clientList) {
+    const filePath = path.join(pathMods, file.name);
+    if (!fs.existsSync(filePath)) {
+      clientList.splice(clientList.indexOf(file), 1);
+    }
+  }
+  storeModsListClient.set("modsList", clientList);
 }
