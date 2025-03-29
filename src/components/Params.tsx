@@ -18,6 +18,7 @@ export default function Params() {
     await window.ipcRenderer.invoke("save-params-launch", paramsLaunch);
   };
   const handleResetStorage = async () => {
+    await window.ipcRenderer.invoke("repair-launcher");
     localStorage.clear();
     window.location.reload();
   };

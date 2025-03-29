@@ -436,12 +436,24 @@ export function setupIpcHandlers(win: BrowserWindow) {
     const arma3Path = store.get("arma3Path") as string | null;
     const paramsLaunch = store.get("paramsLaunch") as string | null;
     if (!arma3Path) return;
-    const arma3PathExe = path.join(arma3Path, "arma3.exe");
+
+    // Vérifier si le dossier x64 existe pour déterminer la version
+    const x64Path = path.join(arma3Path, "arma3_x64.exe");
+    const x86Path = path.join(arma3Path, "arma3.exe");
+    const isX64 = await fs.existsSync(x64Path);
+
+    const paramsLaunchBase = isX64 
+      ? "-skipIntro -noSplash -enableHT -malloc=jemalloc_bi_x64 -hugePages -noPause -noPauseAudio -showScriptErrors "
+      : "-skipIntro -noSplash -enableHT -malloc=jemalloc_bi -hugePages -noPause -noPauseAudio -showScriptErrors ";
+
+    const execPath = isX64 ? x64Path : x86Path;
+
     if (paramsLaunch) {
-      spawn(arma3PathExe, [paramsLaunch]);
+      spawn(execPath, [paramsLaunchBase, paramsLaunch]);
     } else {
-      spawn(arma3PathExe);
+      spawn(execPath, [paramsLaunchBase]);
     }
+
     sendMessage(win, "launch-game-success", "Jeu lancé avec succès");
     setTimeout(() => {
       win.close();
@@ -456,6 +468,10 @@ export function setupIpcHandlers(win: BrowserWindow) {
   //Ouvrir un lien dans le navigateur
   ipcMain.handle("open-url", async (_, url) => {
     shell.openExternal(url);
+  });
+
+  ipcMain.handle("repair-launcher", async () => {
+    storeModsListClient.clear();
   });
 }
 //Gestionnaire d'installation de TFAR
@@ -530,7 +546,6 @@ async function getUpdateMod(win: BrowserWindow) {
     // Reset le fichier modsListClient
     storeModsListClient.set("modsList", modsListClient);
 
-    //Envoyez une notification pour dire que mise a jours nécéssaire, et le nombre de mods à mettre a jour
 
     const isMaintenance = config.maintenance;
     if (isMaintenance) {
@@ -552,6 +567,9 @@ async function getUpdateMod(win: BrowserWindow) {
     console.error("Erreur lors de la création du dossier mod:", error);
     return false;
   }
+
+
+
 }
 
 //Récupérer les DLL et CPP
