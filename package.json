@@ -1,7 +1,7 @@
 {
   "name": "ar3url_launcher",
   "private": false,
-  "version": "6.0.0",
+  "version": "6.0.2",
   "type": "module",
   "description": "Launcher pour A3URL",
   "author": "Joaquine",

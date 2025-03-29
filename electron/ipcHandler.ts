@@ -434,30 +434,30 @@ export function setupIpcHandlers(win: BrowserWindow) {
   //Gestionnaire de lancement du jeu
   ipcMain.handle("launch-game", async () => {
     const arma3Path = store.get("arma3Path") as string | null;
-    const paramsLaunch = store.get("paramsLaunch") as string | null;
+    //const paramsLaunch = store.get("paramsLaunch") as string | null;
     if (!arma3Path) return;
-
-    // Vérifier si le dossier x64 existe pour déterminer la version
     const x64Path = path.join(arma3Path, "arma3_x64.exe");
     const x86Path = path.join(arma3Path, "arma3.exe");
-    const isX64 = await fs.existsSync(x64Path);
-
+    const isX64 = fs.existsSync(x64Path);
+    const modsPaths = path.join(arma3Path, config.folderModsName);
     const paramsLaunchBase = isX64 
-      ? "-skipIntro -noSplash -enableHT -malloc=jemalloc_bi_x64 -hugePages -noPause -noPauseAudio -showScriptErrors "
-      : "-skipIntro -noSplash -enableHT -malloc=jemalloc_bi -hugePages -noPause -noPauseAudio -showScriptErrors ";
+      ? `-skipIntro -noSplash -enableHT -malloc=jemalloc_bi_x64 -hugePages -noPause -noPauseAudio -showScriptErrors -mod=${modsPaths}`
+      : `-skipIntro -noSplash -enableHT -malloc=jemalloc_bi -hugePages -noPause -noPauseAudio -showScriptErrors -mod=${modsPaths}`;
 
     const execPath = isX64 ? x64Path : x86Path;
+    spawn(execPath, [paramsLaunchBase]);
 
+    /*
     if (paramsLaunch) {
       spawn(execPath, [paramsLaunchBase, paramsLaunch]);
     } else {
       spawn(execPath, [paramsLaunchBase]);
-    }
+    }*/
 
     sendMessage(win, "launch-game-success", "Jeu lancé avec succès");
     setTimeout(() => {
       win.close();
-    }, 5000);
+    }, 15000);
   });
   //Gestionnaire de récupération de la dernière news
   ipcMain.handle("get-last-news", async () => {
